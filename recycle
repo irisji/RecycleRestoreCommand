@@ -1,0 +1,33 @@
+#!/bin/bash
+# this script will be stored in $HOME/projet
+
+rm -r $HOME/recyclebin
+mkdir $HOME/recyclebin
+touch $HOME/.restore.info
+
+fileName=$1
+
+
+if [[ $# -eq 0 ]]
+then
+    echo "error1: No filename provided"
+    exit 1
+elif [[ ! -f $fileName ]]
+then 
+    echo "error2: File does not exist"
+    exit 2
+elif [[ -d $fileName ]]
+then    
+    echo "error3: Directory name provided"
+    exit 3
+elif [[ $fileName == "recycle" ]]
+then    
+    echo "error4: Attempting to delete recycle - operation aborted"
+    exit 4
+else
+    inode=$(ls -i $PWD/$fileName| cut -d" " -f1)
+    name=$fileName\_$inode
+    mv $PWD/$fileName $HOME/recyclebin/$name
+    echo "$name:$PWD/$fileName" >> $HOME/.restore.info 
+
+fi
