@@ -1,33 +1,122 @@
 #!/bin/bash
 # this script will be stored in $HOME/projet
 
-rm -r $HOME/recyclebin
-mkdir $HOME/recyclebin
-touch $HOME/.restore.info
-
-fileName=$1
 
 
-if [[ $# -eq 0 ]]
-then
-    echo "error1: No filename provided"
-    exit 1
-elif [[ ! -f $fileName ]]
+#mkdir $HOME/recyclebin
+if [[ ! -d $HOME/recyclebin ]]
 then 
-    echo "error2: File does not exist"
-    exit 2
-elif [[ -d $fileName ]]
-then    
-    echo "error3: Directory name provided"
-    exit 3
-elif [[ $fileName == "recycle" ]]
-then    
-    echo "error4: Attempting to delete recycle - operation aborted"
-    exit 4
-else
-    inode=$(ls -i $PWD/$fileName| cut -d" " -f1)
-    name=$fileName\_$inode
-    mv $PWD/$fileName $HOME/recyclebin/$name
-    echo "$name:$PWD/$fileName" >> $HOME/.restore.info 
-
+    mkdir $HOME/recyclebin
 fi
+#touch $HOME/.restore.info
+if [[ ! -f $HOME/.restore.info ]]
+then
+    touch $HOME/.restore.info
+fi
+
+
+function optFunc(){
+    interactive=False
+    verbose=False
+    while getopts :iv opt
+    do
+        case $opt in
+            i) interactive=True;;
+            v) verbose=True;;
+            *) echo bad option - $OPTARG
+                echo Try 'recycle --help for more information.'
+                exit 1;;
+        esac
+
+    done
+}
+
+
+function recycleFunc(){
+    
+    response="Y"  
+
+    if $interactive
+    then
+        read -p "Do you want to recycle the file? " response  
+    fi
+
+    if [[ $# -eq 0 ]]
+    then
+        echo "error1:no filename provided"
+        exit 1
+    else
+        for fileName in $*
+        do
+            if [[ ! -f $fileName ]]
+            then
+                echo "error2: File does not exist"
+                exit 2
+            elif [[ -d $fileName ]]
+            then    
+                echo "error3: Directory name provided"
+                exit 3
+            elif [[ $fileName == "recycle" ]]
+            then    
+                echo "error4: Attempting to delete recycle - operation aborted"
+                exit 4  
+            else 
+                if $interactive
+                then
+                read -p "Do you want to recycle the file? " userResponse
+                response=$userResponse  
+                fi 
+
+                if [[ $response =~ ^[yY] ]]
+                then
+                
+                    inode=$(ls -i $PWD/$fileName| cut -d" " -f1)
+                    name=$fileName\_$inode
+                    mv $PWD/$fileName $HOME/recyclebin/$name
+                    echo "$name:$PWD/$fileName" >> $HOME/.restore.info
+                    if $verbose
+                    then
+                        echo "$fileName under the $PWD is deleted. The file reference number $name"
+                    fi
+                else
+                    echo "do not recycle the file"
+               fi
+            fi
+        done
+    fi
+
+
+}
+
+optFunc $*
+shift $[OPTIND-1]
+recycleFunc $*
+
+
+
+# fileName=$1
+
+
+# if [[ $# -eq 0 ]]
+# then
+#     echo "error1: No filename provided"
+#     exit 1
+# elif [[ ! -f $fileName ]]
+# then 
+#     echo "error2: File does not exist"
+#     exit 2
+# elif [[ -d $fileName ]]
+# then    
+#     echo "error3: Directory name provided"
+#     exit 3
+# elif [[ $fileName == "recycle" ]]
+# then    
+#     echo "error4: Attempting to delete recycle - operation aborted"
+#     exit 4
+# else
+#     inode=$(ls -i $PWD/$fileName| cut -d" " -f1)
+#     name=$fileName\_$inode
+#     mv $PWD/$fileName $HOME/recyclebin/$name
+#     echo "$name:$PWD/$fileName" >> $HOME/.restore.info 
+
+# fi
