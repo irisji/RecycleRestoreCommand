@@ -74,12 +74,31 @@ function recycleFunc(){
                     fullpaths=$(find $PWD/$fileName -type f)
                     for fullpath in $fullpaths:
                     do
-                        inode=$(ls -i $fullpath | cut -d" " -f1)
-                        fn=$(find $fullpath -type f| egrep -o "[/][^/]*$"|cut -d/ -f2)
-                        name=$fn\_$inode
-                        mv $fullpath $HOME/recyclebin/$name
-                        echo "$name:$fullpath" >> $HOME/.restore.info
+
+                        if $interactive
+                        then
+                        read -p "Do you want to recycle $fileName ? " userResponse
+                        response=$userResponse 
+                        fi
+                        if [[ $response =~ ^[yY] ]]
+                        then
+                            inode=$(ls -i $fullpath | cut -d" " -f1)
+                            fn=$(find $fullpath -type f| egrep -o "[/][^/]*$"|cut -d/ -f2)
+                            name=$fn\_$inode
+                            mv $fullpath $HOME/recyclebin/$name
+                            echo "$name:$fullpath" >> $HOME/.restore.info
+
+                            if $verbose
+                            then
+                                echo "$fileName under the $PWD is deleted. The file reference number $name"
+                            fi
+                        else 
+                            echo "do not recycle the file"
+                        fi
+ 
                     done
+                    $(rm -r $PWD/$fileName)
+
                 else
                     echo "error3: Directory name provided"
                     exit 4 
@@ -117,3 +136,25 @@ optFunc $*
 shift $[OPTIND-1]
 recycleFunc $*
 
+
+
+
+
+                # if $recursive
+                # then
+                    
+                #     fullpaths=$(find $PWD/$fileName -type f)
+                #     for fullpath in $fullpaths:
+                #     do
+
+                #         inode=$(ls -i $fullpath | cut -d" " -f1)
+                #         fn=$(find $fullpath -type f| egrep -o "[/][^/]*$"|cut -d/ -f2)
+                #         name=$fn\_$inode
+                #         mv $fullpath $HOME/recyclebin/$name
+                #         echo "$name:$fullpath" >> $HOME/.restore.info
+
+                #     done
+                # else
+                #     echo "error3: Directory name provided"
+                #     exit 4 
+                # fi
