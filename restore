@@ -1,5 +1,6 @@
 #!/bin/bash
 
+temp_file=$(mktemp)
 
 fileName=$1
 if [[ $# -eq 0 ]]
@@ -33,3 +34,5 @@ else
         echo $pathname | tee /tmp/deletedStorage.txt | echo "$(grep -vf /tmp/deletedStorage.txt $HOME/.restore.info)" > $HOME/.restore.info
     fi
 fi
+
+rm ${temp_file}

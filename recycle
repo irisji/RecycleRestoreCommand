@@ -55,7 +55,7 @@ function recycleFunc(){
     else
         for fileName in $*
         do
-            if [[ ! -f $fileName ]]
+            if [[ ! -f $fileName ]] && [[ ! -d $fileName ]]
             then
                 echo "error2: File does not exist"
                 exit 2
@@ -70,9 +70,8 @@ function recycleFunc(){
 
                 if $recursive
                 then
-                    
                     fullpaths=$(find $PWD/$fileName -type f)
-                    for fullpath in $fullpaths:
+                    for fullpath in $fullpaths
                     do
 
                         if $interactive
