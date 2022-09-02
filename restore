@@ -2,7 +2,9 @@
 
 temp_file=$(mktemp)
 
+#e.g.f1_5432
 fileName=$1
+
 if [[ $# -eq 0 ]]
 then
     echo "error1:no filename provided"
@@ -11,8 +13,14 @@ elif [[ ! -f $HOME/recyclebin/$fileName ]]
 then
     echo "file does not exist"
 else
-    restorePath=$(echo $(cat $HOME/.restore.info | grep $fileName | cut -d: -f2))
+    #f1_5432:/home/trainee1/testing/f1
     pathname=$(echo $(cat $HOME/.restore.info | grep $fileName ))
+    #/home/trainee1/testing/f1
+    restorePath=$(echo $(cat $HOME/.restore.info | grep $fileName | cut -d: -f2))
+    #f1
+    filename_wo_i= $(cut $fileName -d_ -f1)
+    #/home/trainee1/testing
+    restoreDir=$(echo "/$filename_wo_i" | tee /tmp/pat |echo $restorePath | grep -vf /tmp/pat)
     
     
     if [[ -f $restorePath ]]
@@ -29,7 +37,20 @@ else
             echo "cancel restoring"
         fi
     else 
-        # echo " not exists"
+        # echo "restore files are not exists in the supposed directory"
+        depth=$(echo $restoreDir | tr '/' ' '| wc -w|tr -s ' '|cut -d' ' -f2)
+        depth=$(echo $(($depth+1)))
+        echo $depth
+        i=2
+        while [ $i -le $depth ]
+        do
+            recreate_dir=$(echo $restoreDir | cut -d/ -f1-$i)
+            if [[ ! -d $recreate_dir ]]
+            then
+                mkdir $recreate_dir
+            fi
+            ((i++))
+        done
         mv $HOME/recyclebin/$fileName $restorePath
         echo $pathname | tee /tmp/deletedStorage.txt | echo "$(grep -vf /tmp/deletedStorage.txt $HOME/.restore.info)" > $HOME/.restore.info
     fi
