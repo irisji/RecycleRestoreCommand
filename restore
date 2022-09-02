@@ -38,7 +38,7 @@ else
         # echo "restore files are not exists in the supposed directory"
         depth=$(echo $restorePath | tr '/' ' '| wc -w|tr -s ' '|cut -d' ' -f2)
        
-        echo $depth
+        #echo $depth
         i=2
         while [ $i -le $depth ]
         do

@@ -16,15 +16,15 @@ fi
 
 
 function optFunc(){
-    interactive=False
-    verbose=False
-    recursive=False
+    interactive=false
+    verbose=false
+    recursive=false
     while getopts :ivr opt
     do
         case $opt in
-            i) interactive=True;;
-            v) verbose=True;;
-            r) recursive=True;;
+            i) interactive=true;;
+            v) verbose=true;;
+            r) recursive=true;;
             *) echo bad option - $OPTARG
                 echo Try 'recycle --help for more information.'
                 exit 1;;
@@ -123,8 +123,8 @@ function recycleFunc(){
             then
                 if $interactive
                 then
-                read -p "Do you want to recycle $fileName ? " userResponse
-                response=$userResponse  
+                    read -p "Do you want to recycle $fileName ? " userResponse
+                    response=$userResponse  
                 fi 
 
                 if [[ $response =~ ^[yY] ]]
