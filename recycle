@@ -71,7 +71,7 @@ function recycleFunc(){
                 then
                     
                     fullpaths=$(find $PWD/$fileName -type f)
-                    for fullpath in $fullpaths:
+                    for fullpath in $fullpaths
                     do
 
                         inode=$(ls -i $fullpath | cut -d" " -f1)

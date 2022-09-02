@@ -14,13 +14,12 @@ then
     echo "file does not exist"
 else
     #f1_5432:/home/trainee1/testing/f1
-    pathname=$(echo $(cat $HOME/.restore.info | grep $fileName ))
+    pathname=$( echo $( cat $HOME/.restore.info | grep $fileName ))
     #/home/trainee1/testing/f1
-    restorePath=$(echo $(cat $HOME/.restore.info | grep $fileName | cut -d: -f2))
+    restorePath=$( echo $( cat $HOME/.restore.info | grep $fileName | cut -d: -f2))
     #f1
-    filename_wo_i= $(cut $fileName -d_ -f1)
-    #/home/trainee1/testing
-    restoreDir=$(echo "/$filename_wo_i" | tee /tmp/pat |echo $restorePath | grep -vf /tmp/pat)
+    filename_wo_i=$( echo $fileName | cut -d_ -f1)
+
     
     
     if [[ -f $restorePath ]]
@@ -28,9 +27,8 @@ else
         read -p "Do you want to overwirte? y/n " response
         if [[ $response =~ ^[Yy] ]]
         then
-            # echo "overwirte"
-            # echo "$HOME/recyclebin/$fileName"
-            # echo "$pathname"
+            # overwirte file
+
             mv -f $HOME/recyclebin/$fileName $restorePath
             echo $pathname | tee /tmp/deletedStorage | echo "$(grep -vf /tmp/deletedStorage $HOME/.restore.info)" > $HOME/.restore.info
         else    
@@ -38,19 +36,21 @@ else
         fi
     else 
         # echo "restore files are not exists in the supposed directory"
-        depth=$(echo $restoreDir | tr '/' ' '| wc -w|tr -s ' '|cut -d' ' -f2)
-        depth=$(echo $(($depth+1)))
+        depth=$(echo $restorePath | tr '/' ' '| wc -w|tr -s ' '|cut -d' ' -f2)
+       
         echo $depth
         i=2
         while [ $i -le $depth ]
         do
-            recreate_dir=$(echo $restoreDir | cut -d/ -f1-$i)
+            recreate_dir=$(echo $restorePath | cut -d/ -f1-$i)
+            #echo recreate_dir
             if [[ ! -d $recreate_dir ]]
             then
                 mkdir $recreate_dir
             fi
             ((i++))
         done
+
         mv $HOME/recyclebin/$fileName $restorePath
         echo $pathname | tee /tmp/deletedStorage.txt | echo "$(grep -vf /tmp/deletedStorage.txt $HOME/.restore.info)" > $HOME/.restore.info
     fi
